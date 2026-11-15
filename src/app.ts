@@ -37,13 +37,29 @@ const vancacyService = new VancacyService(vacancyRepository);
 app.use('/vacancies', createVacancyRouter(vancacyService));
 
 
-// Repositorio de candidatos.
-// PostgreSQL si existe DATABASE_URL; memoria en caso contrario.
-const candidateRepository: CandidateRepository = process.env.DATABASE_URL
-  ? new PostgresCandidateRepository(
-      createPostgresPool(process.env.DATABASE_URL)
-    )
-  : new InMemoryCandidateRepository();
+
+ // Selecciona el adaptador de persistencia de Candidates.
+const createCandidateRepository = (): CandidateRepository => {
+  const adapter = process.env.CANDIDATES_ADAPTER ?? "memory";
+  const databaseUrl = process.env.DATABASE_URL;
+
+  if (adapter === "sql" && databaseUrl) {
+    console.log("Candidates persistence: PostgreSQL with pg");
+
+    return new PostgresCandidateRepository(
+      createPostgresPool(databaseUrl)
+    );
+  }
+
+  console.log("Candidates persistence: In-memory");
+
+  return new InMemoryCandidateRepository();
+};
+
+// Crear el repositorio de candidatos.
+const candidateRepository: CandidateRepository =
+  createCandidateRepository();
+
 
 // Servicio de aplicación.
 const candidateService = new CandidateService(candidateRepository);
