@@ -11,3 +11,12 @@ CREATE TABLE IF NOT EXISTS vacancies (
 
   salary NUMERIC(10, 2) NOT NULL CHECK (salary > 0)
 );
+
+
+-- Tabla de candidatos
+CREATE TABLE IF NOT EXISTS candidates (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    email VARCHAR(150) NOT NULL,
+    phone VARCHAR(30) NOT NULL
+);
