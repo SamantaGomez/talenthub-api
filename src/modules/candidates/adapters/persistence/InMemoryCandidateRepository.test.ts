@@ -24,6 +24,7 @@ describe("InMemoryCandidateRepository", () => {
     expect(candidate).toEqual({
       id: 1,
       ...candidateData,
+      skills: [],
     });
   });
 
@@ -34,6 +35,7 @@ describe("InMemoryCandidateRepository", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0].name).toBe("Ana Gomez");
+    expect(result[0].skills).toEqual([]);
   });
 
   test("debe buscar un candidato por ID", async () => {
@@ -62,6 +64,7 @@ describe("InMemoryCandidateRepository", () => {
       name: "Ana Robles",
       email: "ana.robles@gmail.com",
       phone: "0987654321",
+      skills: [],
     });
   });
 
@@ -95,12 +98,42 @@ describe("InMemoryCandidateRepository", () => {
 
   test("debe respetar los IDs de candidatos iniciales", async () => {
     const initialRepository = new InMemoryCandidateRepository([
-      { id: 5, ...candidateData },
+      { id: 5, ...candidateData, skills: [] },
     ]);
 
     const candidate = await initialRepository.save(candidateData);
 
     expect(candidate.id).toBe(6);
   });
-});
 
+  // Nueva prueba 1: guardar habilidades.
+  test("debe guardar y recuperar las habilidades", async () => {
+    const candidate = await repository.save({
+      ...candidateData,
+      skills: ["TypeScript", "SQL"],
+    });
+
+    const result = await repository.findById(candidate.id);
+
+    expect(result?.skills).toEqual(["TypeScript", "SQL"]);
+  });
+
+  // Nueva prueba 2: actualizar habilidades.
+  test("debe actualizar las habilidades de un candidato", async () => {
+    const candidate = await repository.save({
+      ...candidateData,
+      skills: ["JavaScript"],
+    });
+
+    const updated = await repository.update(candidate.id, {
+      ...candidateData,
+      skills: ["TypeScript", "PostgreSQL"],
+    });
+
+    expect(updated?.skills).toEqual(["TypeScript", "PostgreSQL"]);
+
+    const result = await repository.findById(candidate.id);
+
+    expect(result?.skills).toEqual(["TypeScript", "PostgreSQL"]);
+  });
+});
