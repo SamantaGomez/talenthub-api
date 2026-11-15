@@ -11,6 +11,7 @@ export class InMemoryCandidateRepository implements CandidateRepository {
     // Copia los candidatos iniciales.
     this.candidates = initialCandidates.map((candidate) => ({
       ...candidate,
+      skills: [...(candidate.skills ?? [])],
     }));
 
     // Evita repetir identificadores existentes.
@@ -20,26 +21,32 @@ export class InMemoryCandidateRepository implements CandidateRepository {
 
   // Caso 1: listar todos los candidatos.
   findAll = async (): Promise<Candidate[]> => {
-    return this.candidates.map((candidate) => ({ ...candidate }));
+    return this.candidates.map((candidate) => ({
+      ...candidate,
+      skills: [...candidate.skills],
+    }));
   };
 
   // Caso 2: buscar un candidato por ID.
   findById = async (id: number): Promise<Candidate | undefined> => {
     const candidate = this.candidates.find((item) => item.id === id);
 
-    return candidate ? { ...candidate } : undefined;
+    return candidate
+      ? { ...candidate, skills: [...candidate.skills] }
+      : undefined;
   };
 
   // Caso 3: guardar un candidato nuevo.
   save = async (newCandidate: NewCandidate): Promise<Candidate> => {
     const candidate: Candidate = {
-      id: this.nextId++,
       ...newCandidate,
+      id: this.nextId++,
+      skills: [...(newCandidate.skills ?? [])],
     };
 
     this.candidates.push(candidate);
 
-    return { ...candidate };
+    return { ...candidate, skills: [...candidate.skills] };
   };
 
   // Caso 4: actualizar un candidato.
@@ -54,13 +61,14 @@ export class InMemoryCandidateRepository implements CandidateRepository {
     }
 
     const updated: Candidate = {
-      id,
       ...data,
+      id,
+      skills: [...(data.skills ?? [])],
     };
 
     this.candidates[index] = updated;
 
-    return { ...updated };
+    return { ...updated, skills: [...updated.skills] };
   };
 
   // Caso 5: eliminar un candidato.

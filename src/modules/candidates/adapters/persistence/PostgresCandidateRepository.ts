@@ -10,10 +10,11 @@ type CandidateRow = {
   name: string;
   email: string;
   phone: string;
+  skills: string[];
 };
 
-// Columnas que se utilizarán en las consultas.
-const COLUMNS = "id, name, email, phone";
+// Columnas utilizadas en las consultas.
+const COLUMNS = "id, name, email, phone, skills";
 
 // Convierte una fila de PostgreSQL en un candidato.
 const toCandidate = (row: CandidateRow): Candidate => ({
@@ -21,6 +22,7 @@ const toCandidate = (row: CandidateRow): Candidate => ({
   name: row.name,
   email: row.email,
   phone: row.phone,
+  skills: row.skills,
 });
 
 // Adaptador de persistencia PostgreSQL.
@@ -49,10 +51,15 @@ export class PostgresCandidateRepository implements CandidateRepository {
   // Caso 3: guardar un candidato.
   save = async (newCandidate: NewCandidate): Promise<Candidate> => {
     const result = await this.pool.query<CandidateRow>(
-      `INSERT INTO candidates (name, email, phone)
-       VALUES ($1, $2, $3)
+      `INSERT INTO candidates (name, email, phone, skills)
+       VALUES ($1, $2, $3, $4)
        RETURNING ${COLUMNS}`,
-      [newCandidate.name, newCandidate.email, newCandidate.phone]
+      [
+        newCandidate.name,
+        newCandidate.email,
+        newCandidate.phone,
+        newCandidate.skills ?? [],
+      ]
     );
 
     return toCandidate(result.rows[0]);
@@ -65,10 +72,19 @@ export class PostgresCandidateRepository implements CandidateRepository {
   ): Promise<Candidate | undefined> => {
     const result = await this.pool.query<CandidateRow>(
       `UPDATE candidates
-       SET name = $1, email = $2, phone = $3
-       WHERE id = $4
+       SET name = $1,
+           email = $2,
+           phone = $3,
+           skills = $4
+       WHERE id = $5
        RETURNING ${COLUMNS}`,
-      [data.name, data.email, data.phone, id]
+      [
+        data.name,
+        data.email,
+        data.phone,
+        data.skills ?? [],
+        id,
+      ]
     );
 
     return result.rows[0] ? toCandidate(result.rows[0]) : undefined;
