@@ -8,6 +8,13 @@ import { PostgresVacancyRepository } from './modules/vacancies/adapters/persiste
 import { VacancyRepository } from './modules/vacancies/ports/VacancyRepository';
 import { createPostgresPool } from './shared/database/postgresPool';
 
+import { CandidateRepository } from "./modules/candidates/ports/CandidateRepository";
+import { CandidateService } from "./modules/candidates/application/CandidateService";
+import { InMemoryCandidateRepository } from "./modules/candidates/adapters/persistence/InMemoryCandidateRepository";
+import { PostgresCandidateRepository } from "./modules/candidates/adapters/persistence/PostgresCandidateRepository";
+import { createCandidateRouter } from "./modules/candidates/adapters/http/candidateRoutes";
+
+
 const app = express();
 
 app.use(express.json());
@@ -28,6 +35,22 @@ const vancacyService = new VancacyService(vacancyRepository);
 
 //3) Rutas: se le entrega el servicio y se monta bajo el prefijo /vacancies
 app.use('/vacancies', createVacancyRouter(vancacyService));
+
+
+// Repositorio de candidatos.
+// PostgreSQL si existe DATABASE_URL; memoria en caso contrario.
+const candidateRepository: CandidateRepository = process.env.DATABASE_URL
+  ? new PostgresCandidateRepository(
+      createPostgresPool(process.env.DATABASE_URL)
+    )
+  : new InMemoryCandidateRepository();
+
+// Servicio de aplicación.
+const candidateService = new CandidateService(candidateRepository);
+
+// Registrar las rutas HTTP.
+app.use("/candidates", createCandidateRouter(candidateService));
+
 
 app.use(notFoundHandler);
 
