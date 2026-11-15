@@ -14,6 +14,7 @@ describe("CandidateService", () => {
     name: "Ana Gomez",
     email: "ana@gmail.com",
     phone: "0991234567",
+    skills: [],
   };
 
   beforeEach(() => {
@@ -59,6 +60,7 @@ describe("CandidateService", () => {
       name: "Ana Gomez",
       email: "ana@gmail.com",
       phone: "0991234567",
+      skills: [],
     });
 
     expect(result).toEqual(candidate);
@@ -66,6 +68,7 @@ describe("CandidateService", () => {
       name: "Ana Gomez",
       email: "ana@gmail.com",
       phone: "0991234567",
+      skills: [],
     });
   });
 
@@ -75,6 +78,7 @@ describe("CandidateService", () => {
         name: "Ana Gomez",
         email: "correo-invalido",
         phone: "0991234567",
+        skills: [],
       })
     ).rejects.toThrow(DomainError);
 
@@ -88,6 +92,7 @@ describe("CandidateService", () => {
       name: "Ana Gomez",
       email: "ana@gmail.com",
       phone: "0991234567",
+      skills: [],
     });
 
     expect(result).toEqual(candidate);
@@ -95,6 +100,7 @@ describe("CandidateService", () => {
       name: "Ana Gomez",
       email: "ana@gmail.com",
       phone: "0991234567",
+      skills: [],
     });
   });
 
