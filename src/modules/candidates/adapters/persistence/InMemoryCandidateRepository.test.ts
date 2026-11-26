@@ -5,10 +5,12 @@ describe("InMemoryCandidateRepository", () => {
   let repository: InMemoryCandidateRepository;
 
   const candidateData = {
-    name: "Ana Gomez",
-    email: "ana@gmail.com",
-    phone: "0991234567",
-  };
+  name: "Samy Gomez",
+  email: "samy@gmail.com",
+  phone: "0991234567",
+  city: "Quito",
+  yearsOfExperience: 3,
+};
 
   beforeEach(() => {
     repository = new InMemoryCandidateRepository();
@@ -34,7 +36,7 @@ describe("InMemoryCandidateRepository", () => {
     const result = await repository.findAll();
 
     expect(result).toHaveLength(1);
-    expect(result[0].name).toBe("Ana Gomez");
+    expect(result[0].name).toBe(candidateData.name);
     expect(result[0].skills).toEqual([]);
   });
 
@@ -54,18 +56,22 @@ describe("InMemoryCandidateRepository", () => {
     const candidate = await repository.save(candidateData);
 
     const updated = await repository.update(candidate.id, {
-      name: "Ana Robles",
-      email: "ana.robles@gmail.com",
-      phone: "0987654321",
-    });
+  name: "Carlin Robles",
+  email: "carlin.robles@gmail.com",
+  phone: "0987654321",
+  city: "Cuenca",
+  yearsOfExperience: 5,
+});
 
     expect(updated).toEqual({
-      id: 1,
-      name: "Ana Robles",
-      email: "ana.robles@gmail.com",
-      phone: "0987654321",
-      skills: [],
-    });
+  id: 1,
+  name: "Carlin Robles",
+  email: "carlin.robles@gmail.com",
+  phone: "0987654321",
+  city: "Cuenca",
+  yearsOfExperience: 5,
+  skills: [],
+});
   });
 
   test("debe devolver undefined al actualizar uno inexistente", async () => {
@@ -136,4 +142,36 @@ describe("InMemoryCandidateRepository", () => {
 
     expect(result?.skills).toEqual(["TypeScript", "PostgreSQL"]);
   });
+  // Verifica el almacenamiento de ciudad y experiencia.
+test("debe guardar y recuperar la ciudad y experiencia", async () => {
+  const candidate = await repository.save({
+    ...candidateData,
+    city: "Ambato",
+    yearsOfExperience: 0,
+  });
+
+  const result = await repository.findById(candidate.id);
+
+  expect(result?.city).toBe("Ambato");
+  expect(result?.yearsOfExperience).toBe(0);
+});
+
+// Verifica la actualización de ciudad y experiencia.
+test("debe actualizar la ciudad y experiencia de un candidato", async () => {
+  const candidate = await repository.save(candidateData);
+
+  const updated = await repository.update(candidate.id, {
+    ...candidateData,
+    city: "Guayaquil",
+    yearsOfExperience: 1,
+  });
+
+  expect(updated?.city).toBe("Guayaquil");
+  expect(updated?.yearsOfExperience).toBe(1);
+
+  const result = await repository.findById(candidate.id);
+
+  expect(result?.city).toBe("Guayaquil");
+  expect(result?.yearsOfExperience).toBe(1);
+});
 });

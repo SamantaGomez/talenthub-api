@@ -10,12 +10,14 @@ describe("CandidateService", () => {
   let service: CandidateService;
 
   const candidate: Candidate = {
-    id: 1,
-    name: "Ana Gomez",
-    email: "ana@gmail.com",
-    phone: "0991234567",
-    skills: [],
-  };
+  id: 1,
+  name: "Samy Gomez",
+  email: "samy@gmail.com",
+  phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
+  skills: [],
+};
 
   beforeEach(() => {
     repository = {
@@ -57,17 +59,21 @@ describe("CandidateService", () => {
     repository.save.mockResolvedValue(candidate);
 
     const result = await service.create({
-      name: "Ana Gomez",
-      email: "ana@gmail.com",
+      name: "Samy Gomez",
+      email: "samy@gmail.com",
       phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
       skills: [],
     });
 
     expect(result).toEqual(candidate);
     expect(repository.save).toHaveBeenCalledWith({
-      name: "Ana Gomez",
-      email: "ana@gmail.com",
+      name: "Samy Gomez",
+      email: "samy@gmail.com",
       phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
       skills: [],
     });
   });
@@ -78,6 +84,8 @@ describe("CandidateService", () => {
         name: "Ana Gomez",
         email: "correo-invalido",
         phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
         skills: [],
       })
     ).rejects.toThrow(DomainError);
@@ -89,17 +97,21 @@ describe("CandidateService", () => {
     repository.update.mockResolvedValue(candidate);
 
     const result = await service.update(1, {
-      name: "Ana Gomez",
-      email: "ana@gmail.com",
+      name: "Samy Gomez",
+      email: "samy@gmail.com",
       phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
       skills: [],
     });
 
     expect(result).toEqual(candidate);
     expect(repository.update).toHaveBeenCalledWith(1, {
-      name: "Ana Gomez",
-      email: "ana@gmail.com",
+      name: "Samy Gomez",
+      email: "samy@gmail.com",
       phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
       skills: [],
     });
   });
@@ -109,9 +121,11 @@ describe("CandidateService", () => {
 
     await expect(
       service.update(99, {
-        name: "Ana Gomez",
-        email: "ana@gmail.com",
+        name: "Samy Gomez",
+      email: "samy@gmail.com",
         phone: "0991234567",
+city: "Quito",
+yearsOfExperience: 3,
       })
     ).rejects.toThrow(NotFoundError);
   });
@@ -128,4 +142,29 @@ describe("CandidateService", () => {
 
     await expect(service.remove(99)).rejects.toThrow(NotFoundError);
   });
+  test("debe rechazar un candidato con ciudad vacía", async () => {
+  await expect(
+    service.create({
+      name: "Samy Gomez",
+      email: "samy@gmail.com",
+      phone: "0991234567",
+      city: "",
+      yearsOfExperience: 3,
+      skills: [],
+    })
+  ).rejects.toThrow(DomainError);
+});
+
+test("debe rechazar un candidato con experiencia negativa", async () => {
+  await expect(
+    service.create({
+      name: "Samy Gomez",
+      email: "samy@gmail.com",
+      phone: "0991234567",
+      city: "Quito",
+      yearsOfExperience: -1,
+      skills: [],
+    })
+  ).rejects.toThrow(DomainError);
+});
 });
