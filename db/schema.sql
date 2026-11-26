@@ -1,4 +1,3 @@
-
 -- Crea la tabla de vacantes.
 CREATE TABLE IF NOT EXISTS vacancies (
     id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -14,9 +13,20 @@ CREATE TABLE IF NOT EXISTS candidates (
     name VARCHAR(150) NOT NULL,
     email VARCHAR(150) NOT NULL,
     phone VARCHAR(30) NOT NULL,
+    city VARCHAR(150) NOT NULL DEFAULT 'No especificada',
+    years_of_experience INTEGER NOT NULL DEFAULT 0
+        CHECK (years_of_experience >= 0),
     skills TEXT[] NOT NULL DEFAULT '{}'
 );
 
--- Actualiza una tabla candidates existente sin borrar sus datos.
+-- Actualiza una tabla existente sin eliminar sus datos.
 ALTER TABLE candidates
 ADD COLUMN IF NOT EXISTS skills TEXT[] NOT NULL DEFAULT '{}';
+
+ALTER TABLE candidates
+ADD COLUMN IF NOT EXISTS city VARCHAR(150)
+NOT NULL DEFAULT 'No especificada';
+
+ALTER TABLE candidates
+ADD COLUMN IF NOT EXISTS years_of_experience INTEGER
+NOT NULL DEFAULT 0 CHECK (years_of_experience >= 0);
