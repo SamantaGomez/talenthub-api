@@ -8,9 +8,11 @@ import { PostgresCandidateRepository } from "./PostgresCandidateRepository";
 
 // Datos de ejemplo para las pruebas.
 const sampleCandidate = {
-  name: "Ana Gomez",
-  email: "ana@gmail.com",
+  name: "Samy Gomez",
+  email: "samy@gmail.com",
   phone: "0991234567",
+  city: "Quito",
+  yearsOfExperience: 3,
 };
 
 describe("PostgresCandidateRepository", () => {
@@ -85,10 +87,12 @@ describe("PostgresCandidateRepository", () => {
     await repository.save(sampleCandidate);
 
     const second = await repository.save({
-      name: "Carlos Perez",
-      email: "carlos@gmail.com",
-      phone: "0987654321",
-    });
+  name: "Carlos Gomez",
+  email: "carlos@gmail.com",
+  phone: "0987654321",
+  city: "Guayaquil",
+  yearsOfExperience: 1,
+});
 
     const result = await repository.findAll();
 
@@ -113,22 +117,27 @@ describe("PostgresCandidateRepository", () => {
   test("debe actualizar un candidato existente", async () => {
     const saved = await repository.save(sampleCandidate);
 
-    const updated = await repository.update(saved.id, {
-      name: "Ana Robles",
-      email: "ana.robles@gmail.com",
-      phone: "0987654321",
-    });
+ const updated = await repository.update(saved.id, {
+  name: "Carlin Robles",
+  email: "carlin.robles@gmail.com",
+  phone: "0987654321",
+  city: "Cuenca",
+  yearsOfExperience: 5,
+});
 
     expect(updated).toEqual({
-      id: saved.id,
-      name: "Ana Robles",
-      email: "ana.robles@gmail.com",
-      phone: "0987654321",
-      skills: [],
-    });
-  });
+  id: saved.id,
+  name: "Carlin Robles",
+  email: "carlin.robles@gmail.com",
+  phone: "0987654321",
+  city: "Cuenca",
+  yearsOfExperience: 5,
+  skills: [],
+});
+});
 
-  test("debe devolver undefined al actualizar uno inexistente", async () => {
+test("debe devolver undefined al actualizar uno inexistente", async () => {
+
     const result = await repository.update(999, sampleCandidate);
 
     expect(result).toBeUndefined();
@@ -180,4 +189,33 @@ describe("PostgresCandidateRepository", () => {
 
     expect(result?.skills).toEqual(["TypeScript", "PostgreSQL"]);
   });
+  // Verifica la persistencia de ciudad y experiencia.
+test("debe guardar y recuperar la ciudad y experiencia", async () => {
+  const saved = await repository.save({
+    ...sampleCandidate,
+    city: "Ambato",
+    yearsOfExperience: 0,
+  });
+
+  const result = await repository.findById(saved.id);
+
+  expect(result?.city).toBe("Ambato");
+  expect(result?.yearsOfExperience).toBe(0);
+});
+
+// Verifica la actualización de ciudad y experiencia.
+test("debe actualizar la ciudad y experiencia en PostgreSQL", async () => {
+  const saved = await repository.save(sampleCandidate);
+
+  await repository.update(saved.id, {
+    ...sampleCandidate,
+    city: "Cuenca",
+    yearsOfExperience: 1,
+  });
+
+  const result = await repository.findById(saved.id);
+
+  expect(result?.city).toBe("Cuenca");
+  expect(result?.yearsOfExperience).toBe(1);
+});
 });

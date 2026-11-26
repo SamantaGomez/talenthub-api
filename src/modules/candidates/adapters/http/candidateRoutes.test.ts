@@ -33,14 +33,19 @@ describe("Candidate HTTP Routes", () => {
     const response = await request(app)
       .post("/candidates")
       .send({
-        name: "Ana Perez",
-        email: "ana@example.com",
+        name: "Samy Perez",
+        email: "samy@example.com",
         phone: "0999999999",
-      });
+        city: "Quito",
+        yearsOfExperience: 0,
+      })
 
     expect(response.status).toBe(201);
-    expect(response.body.name).toBe("Ana Perez");
+    expect(response.body.name).toBe("Samy Perez");
     expect(response.body.id).toBeDefined();
+    expect(response.body.city).toBe("Quito");
+    expect(response.body.yearsOfExperience).toBe(0);
+    expect(response.body.skills).toEqual([]);
 
     candidateId = response.body.id;
   });
@@ -55,17 +60,21 @@ describe("Candidate HTTP Routes", () => {
   });
 
   it("PUT /candidates/:id actualiza un candidato", async () => {
-    const response = await request(app)
-      .put(`/candidates/${candidateId}`)
-      .send({
-        name: "Ana Gomez",
-        email: "ana@example.com",
-        phone: "0988888888",
-      });
+  const response = await request(app)
+    .put(`/candidates/${candidateId}`)
+    .send({
+      name: "Samy Gomez",
+      email: "samy@example.com",
+      phone: "0988888888",
+      city: "Guayaquil",
+      yearsOfExperience: 1,
+    });
 
-    expect(response.status).toBe(200);
-    expect(response.body.name).toBe("Ana Gomez");
-  });
+  expect(response.status).toBe(200);
+  expect(response.body.name).toBe("Samy Gomez");
+  expect(response.body.city).toBe("Guayaquil");
+  expect(response.body.yearsOfExperience).toBe(1);
+});
 
   it("DELETE /candidates/:id elimina un candidato", async () => {
     const response = await request(app).delete(
@@ -105,4 +114,35 @@ describe("Candidate HTTP Routes", () => {
     expect(response.status).toBe(200);
     expect(response.body).toEqual([]);
   });
+  // Verifica que la ciudad sea obligatoria.
+test("debe devolver 400 cuando la ciudad es inválida", async () => {
+  const response = await request(app)
+    .post("/candidates")
+    .send({
+      name: "Maria Lopez",
+      email: "maria@example.com",
+      phone: "0991234567",
+      city: "",
+      yearsOfExperience: 3,
+      skills: [],
+    });
+
+  expect(response.status).toBe(400);
+});
+
+// Verifica que la experiencia no sea negativa.
+test("debe devolver 400 cuando la experiencia es negativa", async () => {
+  const response = await request(app)
+    .post("/candidates")
+    .send({
+      name: "Carlos Torres",
+      email: "carlos@example.com",
+      phone: "0987654321",
+      city: "Cuenca",
+      yearsOfExperience: -1,
+      skills: [],
+    });
+
+  expect(response.status).toBe(400);
+});
 });
