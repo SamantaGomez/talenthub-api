@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 
 import { InMemoryVacancyRepository } from './modules/vacancies/adapters/persistence/InMemoryVacancyRepository';
 import { VancacyService } from './modules/vacancies/application/VacancyService';
@@ -16,6 +17,13 @@ import { createCandidateRouter } from "./modules/candidates/adapters/http/candid
 
 
 const app = express();
+
+// Configura el origen permitido para el frontend.
+const corsOrigin = process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+
+app.use(cors({
+    origin: corsOrigin
+}));
 
 app.use(express.json());
 
