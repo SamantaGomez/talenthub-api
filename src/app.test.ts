@@ -134,3 +134,38 @@ describe('unknown routes', () => {
     expect(response.body.error).toBe('Ruta no encontrada');
   });
 });
+
+describe('CORS configuration', () => {
+  const allowedOrigin =
+    process.env.CORS_ORIGIN ?? 'http://localhost:5173';
+
+  it('allows requests from the frontend origin', async () => {
+    const response = await request(app)
+      .get('/vacancies')
+      .set('Origin', allowedOrigin);
+
+    expect(response.headers['access-control-allow-origin'])
+      .toBe(allowedOrigin);
+  });
+
+  it('does not authorize requests from another origin', async () => {
+    const response = await request(app)
+      .get('/vacancies')
+      .set('Origin', 'http://otro-sitio.com');
+
+    expect(response.headers['access-control-allow-origin'])
+      .not.toBe('http://otro-sitio.com');
+  });
+
+  it('responds to preflight requests with 204 and allows POST', async () => {
+    const response = await request(app)
+      .options('/candidates')
+      .set('Origin', allowedOrigin)
+      .set('Access-Control-Request-Method', 'POST');
+
+    expect(response.status).toBe(204);
+
+    expect(response.headers['access-control-allow-methods'])
+      .toContain('POST');
+  });
+});
